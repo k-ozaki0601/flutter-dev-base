@@ -52,6 +52,7 @@ class IntegerTextFormField extends TextFormField {
     ScrollPhysics scrollPhysics,
     Iterable<String> autofillHints,
     AutovalidateMode autovalidateMode,
+    bool required = false,
     ValidationBuilder validationBuilder,
   }) : super(
           key: key,
@@ -59,10 +60,7 @@ class IntegerTextFormField extends TextFormField {
           initialValue:
               controller != null ? controller.text : (initialValue ?? ''),
           focusNode: focusNode,
-          decoration: decoration.from({
-            'required': ValidationBuilder(validationBuilder: validationBuilder)
-                .hasRequired()
-          }),
+          decoration: decoration.from({'required': required}),
           keyboardType: TextInputType.number,
           textCapitalization: textCapitalization,
           textInputAction: textInputAction ?? config['textInputAction'],
@@ -91,7 +89,8 @@ class IntegerTextFormField extends TextFormField {
           onEditingComplete: onEditingComplete,
           onFieldSubmitted: onFieldSubmitted,
           onSaved: onSaved,
-          validator: ValidationBuilder(validationBuilder: validationBuilder)
+          validator: ValidationBuilder(required: required)
+              .from(validationBuilder)
               .integer()
               .build(),
           inputFormatters: inputFormatters,

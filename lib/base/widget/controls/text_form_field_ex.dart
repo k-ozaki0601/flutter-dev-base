@@ -53,6 +53,7 @@ class TextFormFieldEx extends TextFormField {
     ScrollPhysics scrollPhysics,
     Iterable<String> autofillHints,
     AutovalidateMode autovalidateMode,
+    bool required = false,
     ValidationBuilder validationBuilder,
   }) : super(
           key: key,
@@ -60,10 +61,7 @@ class TextFormFieldEx extends TextFormField {
           initialValue:
               controller != null ? controller.text : (initialValue ?? ''),
           focusNode: focusNode,
-          decoration: decoration.from({
-            'required': ValidationBuilder(validationBuilder: validationBuilder)
-                .hasRequired()
-          }),
+          decoration: decoration.from({'required': required}),
           keyboardType: keyboardType,
           textCapitalization: textCapitalization,
           textInputAction: textInputAction ?? config['textInputAction'],
@@ -92,8 +90,9 @@ class TextFormFieldEx extends TextFormField {
           onEditingComplete: onEditingComplete,
           onFieldSubmitted: onFieldSubmitted,
           onSaved: onSaved,
-          validator:
-              ValidationBuilder(validationBuilder: validationBuilder).build(),
+          validator: ValidationBuilder(required: required)
+              .from(validationBuilder)
+              .build(),
           inputFormatters: inputFormatters,
           enabled: enabled,
           cursorWidth: cursorWidth,

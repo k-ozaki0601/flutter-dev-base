@@ -52,6 +52,7 @@ class PasswordTextFormField extends StatefulWidget {
     this.scrollPhysics,
     this.autofillHints,
     this.autovalidateMode,
+    this.required = false,
     this.validationBuilder,
   });
 
@@ -100,6 +101,7 @@ class PasswordTextFormField extends StatefulWidget {
   final ScrollPhysics scrollPhysics;
   final Iterable<String> autofillHints;
   final AutovalidateMode autovalidateMode;
+  final bool required;
   final ValidationBuilder validationBuilder;
 
   @override
@@ -134,11 +136,7 @@ class _PasswordTextFormFieldState extends State<PasswordTextFormField> {
       key: widget.key,
       initialValue: widget.initialValue,
       focusNode: widget.focusNode,
-      decoration: decoration.from({
-        'required':
-            ValidationBuilder(validationBuilder: widget.validationBuilder)
-                .hasRequired()
-      }),
+      decoration: decoration.from({'required': widget.required}),
       keyboardType: TextInputType.visiblePassword,
       textCapitalization: widget.textCapitalization,
       textInputAction: widget.textInputAction ?? config['textInputAction'],
@@ -181,7 +179,8 @@ class _PasswordTextFormFieldState extends State<PasswordTextFormField> {
       scrollPhysics: widget.scrollPhysics,
       autofillHints: widget.autofillHints,
       autovalidateMode: widget.autovalidateMode,
-      validator: ValidationBuilder(validationBuilder: widget.validationBuilder)
+      validator: ValidationBuilder(required: widget.required)
+          .from(widget.validationBuilder)
           .build(),
     );
   }
