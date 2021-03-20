@@ -11,9 +11,14 @@ class ValidationBuilder {
   ValidationBuilder({
     String localeName,
     FormValidatorLocale locale,
+    ValidationBuilder validationBuilder,
   }) : _locale = locale ??
             (localeName == null ? globalLocale : createLocale(localeName)) {
     ArgumentError.checkNotNull(_locale, 'locale');
+    if (validationBuilder != null) {
+      validations.addAll(validationBuilder.validations);
+      _required = validationBuilder.hasRequired();
+    }
   }
 
   static FormValidatorLocale globalLocale = createLocale('default');
@@ -24,6 +29,8 @@ class ValidationBuilder {
 
   final FormValidatorLocale _locale;
   final List<StringValidationCallback> validations = [];
+  bool _required = false;
+  bool hasRequired() => _required;
 
   /// Clears validation list and adds required validation if
   ValidationBuilder reset() {
@@ -86,8 +93,10 @@ class ValidationBuilder {
   }
 
   /// Value must not be empty or null
-  ValidationBuilder required([String message]) =>
-      add((v) => (v?.isEmpty ?? true) ? message ?? _locale.required() : null);
+  ValidationBuilder required([String message]) {
+    _required = true;
+    return add((v) => (v?.isEmpty ?? true) ? message ?? _locale.required() : null);
+  }
 
   /// Value length must be greater than or equal to [minLength]
   ValidationBuilder minLength(int minLength, [String message]) =>

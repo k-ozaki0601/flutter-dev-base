@@ -148,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 PasswordTextFormField(
-                  // obscureText: !_showPassword,
+                  validationBuilder: ValidationBuilder().required(),
                   decoration: InputDecoration(
                     hintText: 'password',
                     labelText: 'パスワード',
