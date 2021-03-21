@@ -16,8 +16,8 @@ const double _kCupertinoDatePickerHeight = 216;
 /// save, reset, or validate multiple fields at once. To use without a [Form],
 /// pass a [GlobalKey] to the constructor and use [GlobalKey.currentState] to
 /// save or reset the form field.
-class DateTimeTextFormField extends FormField<DateTime> {
-  DateTimeTextFormField({
+class DatepickerFormField extends FormField<DateTime> {
+  DatepickerFormField({
     Key key,
     FormFieldSetter<DateTime> onSaved,
     FormFieldValidator<DateTime> validator,
@@ -265,9 +265,9 @@ DateFormat getDateFormatFromDateFieldPickerMode(DateTimeFieldPickerMode mode) {
     case DateTimeFieldPickerMode.time:
       return DateFormat.Hm();
     case DateTimeFieldPickerMode.date:
-      return DateFormat('yyyy-MM-dd');
+      return DateFormat.yMd();
     default:
-      return DateFormat('yyyy-MM-dd').add_Hm();
+      return DateFormat.yMd().add_Hm();
   }
 }
 

@@ -71,4 +71,7 @@ class LocaleJa extends FormValidatorLocale {
 
   @override
   String pattern(String v) => 'この値は無効です。';
+
+  @override
+  String date(String v) => '有効な日付を入力してください。';
 }

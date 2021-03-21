@@ -258,4 +258,8 @@ class ValidationBuilder {
       add((v) => (v.isEmptyOrNull() || RegExp(pattern).hasMatch(v))
           ? null
           : message ?? _locale.pattern(v));
+
+  /// Value must be a date
+  ValidationBuilder date([String message]) =>
+      add((v) => DateTime.tryParse(v) == null ? _locale.date(v) : message);
 }

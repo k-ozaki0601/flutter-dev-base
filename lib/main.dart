@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
 import 'base/validation/validator_builder.dart';
 import 'base/widget/widget.dart';
 
 void main() {
+  Intl.defaultLocale = 'ja_JP';
   runApp(MyApp());
 }
 
@@ -166,25 +168,25 @@ class _MyHomePageState extends State<MyHomePage> {
                     labelText: 'Date',
                   ),
                 ),
-                DateTimeTextFormField(
+                DatepickerFormField(
                   decoration: InputDecoration(
                     hintText: 'date',
-                    labelText: 'Date',
+                    labelText: 'Datepickder-date',
                   ),
                 ),
-                DateTimeTextFormField(
+                DatepickerFormField(
                   mode: DateTimeFieldPickerMode.time,
                   decoration: InputDecoration(
                     hintText: 'time',
-                    labelText: 'Time',
+                    labelText: 'Datepicker-Time',
                   ),
                 ),
-                DateTimeTextFormField(
+                DatepickerFormField(
                   initialDatePickerMode: DatePickerMode.year,
                   mode: DateTimeFieldPickerMode.dateAndTime,
                   decoration: InputDecoration(
                     hintText: 'datetime',
-                    labelText: 'DateTime',
+                    labelText: 'Datepicker-DateTime',
                   ),
                 ),
                 TextFormField(

@@ -6,11 +6,11 @@ class LocaleEn extends FormValidatorLocale {
 
   @override
   String minLength(String v, int n) =>
-      'The field must be at least $n characters long';
+      'The field must be at least $n characters long.';
 
   @override
   String maxLength(String v, int n) =>
-      'The field must be at most $n characters long';
+      'The field must be at most $n characters long.';
 
   @override
   String length(String v, int min, int max) =>
@@ -44,22 +44,22 @@ class LocaleEn extends FormValidatorLocale {
   String lte(String v, int n) => 'This value should be less or equal to $n.';
 
   @override
-  String email(String v) => 'The field is not a valid email address';
+  String email(String v) => 'The field is not a valid email address.';
 
   @override
-  String phoneNumber(String v) => 'The field is not a valid phone number';
+  String phoneNumber(String v) => 'The field is not a valid phone number.';
 
   @override
-  String required() => 'The field is required';
+  String required() => 'The field is required.';
 
   @override
-  String ip(String v) => 'The field is not a valid IP address';
+  String ip(String v) => 'The field is not a valid IP address.';
 
   @override
-  String ipv6(String v) => 'The field is not a valid IPv6 address';
+  String ipv6(String v) => 'The field is not a valid IPv6 address.';
 
   @override
-  String url(String v) => 'The field is not a valid URL address';
+  String url(String v) => 'The field is not a valid URL address.';
 
   @override
   String number(String v) => 'This value should be a valid number.';
@@ -78,5 +78,8 @@ class LocaleEn extends FormValidatorLocale {
       'This value should be alphanumeric or symbols.';
 
   @override
-  String pattern(String v) => 'his value seems to be invalid.';
+  String pattern(String v) => 'This value seems to be invalid.';
+
+  @override
+  String date(String v) => 'This field is not a valid date.';
 }
