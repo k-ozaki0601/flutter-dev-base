@@ -189,6 +189,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     labelText: 'Datepicker-DateTime',
                   ),
                 ),
+                PhoneTextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'phone number',
+                  ),
+                ),
                 TextFormField(
                   textInputAction: TextInputAction.next,
                   validator: ValidationBuilder().minLength(5).build(),
