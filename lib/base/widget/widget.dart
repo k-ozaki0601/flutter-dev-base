@@ -13,3 +13,4 @@ export 'controls/url_text_form_field.dart';
 export 'controls/date_text_form_field.dart';
 export 'controls/datepicker_form_field.dart';
 export 'controls/phone_text_form_field.dart';
+export 'controls/textarea_form_field.dart';

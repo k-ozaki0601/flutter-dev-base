@@ -194,6 +194,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     labelText: 'phone number',
                   ),
                 ),
+                TextareaFormField(
+                  decoration: InputDecoration(
+                    hintText: 'textarea',
+                    labelText: 'textarea',
+                  ),
+                ),
                 TextFormField(
                   textInputAction: TextInputAction.next,
                   validator: ValidationBuilder().minLength(5).build(),
