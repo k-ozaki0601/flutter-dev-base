@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_validation/base/model/label_value.dart';
 import 'package:intl/intl.dart';
 import 'base/validation/validator_builder.dart';
 import 'base/widget/widget.dart';
+import 'base/model/label_value.dart';
 
 void main() {
   Intl.defaultLocale = 'ja_JP';
@@ -64,6 +66,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    List<LabelValue<String>> genders = [];
+    genders.add(LabelValue<String>(
+      label: "男",
+      value: "1",
+    ));
+    genders.add(LabelValue<String>(
+      label: "女",
+      value: "2",
+    ));
+
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -299,6 +311,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 InputDatePickerFormField(
                   firstDate: DateTime(2019),
                   lastDate: DateTime(2020, 12, 12),
+                ),
+                RadioFormField<String>(
+                  selections: genders,
+                  defaultValue: "2",
                 ),
                 SizedBox(
                   height: 30,
