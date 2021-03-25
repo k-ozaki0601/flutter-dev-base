@@ -314,7 +314,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 RadioFormField<String>(
                   selections: genders,
+                  disabled: [],
                   defaultValue: "2",
+                ),
+                CheckboxFormField<String>(
+                  selections:genders,
+                  defaultValues: ["1"],
+                  disabled: ["1"],
                 ),
                 SizedBox(
                   height: 30,

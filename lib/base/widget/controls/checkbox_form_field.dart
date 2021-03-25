@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_validation/base/widget/controls/selections_orientation_define.dart';
 import '../../model/label_value.dart';
 import 'selections_orientation_define.dart';
 
-class LabeledRadio<T> extends StatelessWidget {
+class LabeledCheckbox<T> extends StatelessWidget {
   final String label;
   final EdgeInsets padding;
-  final T groupValue;
+  final bool checked;
   final T value;
   final bool disabled;
   final TextStyle labelStyle;
   final Function onChanged;
   final Map optional;
 
-  const LabeledRadio({
+  const LabeledCheckbox({
     Key key,
     this.label,
     this.padding = const EdgeInsets.symmetric(horizontal: 5.0),
-    this.groupValue,
+    this.checked,
     this.value,
     this.disabled,
     this.labelStyle,
@@ -34,21 +35,18 @@ class LabeledRadio<T> extends StatelessWidget {
       onTap: disabled
           ? null
           : () {
-              if (value != groupValue) {
-                onChanged(value);
-              }
+              onChanged(value, !checked);
             },
       child: Padding(
         padding: padding,
         child: Row(
           children: <Widget>[
-            Radio(
-              groupValue: groupValue,
-              value: value,
+            Checkbox(
+              value: checked,
               onChanged: disabled
                   ? null
-                  : (T newValue) {
-                      onChanged(newValue);
+                  : (bool newValue) {
+                      onChanged(value, newValue);
                     },
             ),
             Text(label, style: textLabelStyle),
@@ -59,63 +57,73 @@ class LabeledRadio<T> extends StatelessWidget {
   }
 }
 
-class RadioFormField<T> extends StatefulWidget {
+class CheckboxFormField<T> extends StatefulWidget {
   final List<LabelValue<T>> selections;
+  final List<T> defaultValues;
   final List<T> disabled;
-  final T defaultValue;
-  final void Function(T value) onChange;
+  final void Function(T value, bool checked, Map<T, bool> checkedValues)
+      onChange;
   final TextStyle labelStyle;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry margin;
   final SelectionsOrientationDefine orientation;
 
-  RadioFormField({
+  CheckboxFormField({
     Key key,
     this.selections,
+    this.defaultValues = const [],
     this.disabled = const [],
-    this.defaultValue,
     this.onChange,
     this.labelStyle = const TextStyle(),
-    this.orientation = SelectionsOrientationDefine.HORIZONTAL,
     this.padding = const EdgeInsets.all(0.0),
     this.margin = const EdgeInsets.all(0.0),
+    this.orientation = SelectionsOrientationDefine.HORIZONTAL,
   }) : super(key: key);
 
   @override
-  _RadioFormFieldState<T> createState() => _RadioFormFieldState();
+  _CheckboxFormFieldState<T> createState() => _CheckboxFormFieldState();
 }
 
-class _RadioFormFieldState<T> extends State<RadioFormField> {
-  T _selected;
-  LabeledRadio _selectedElement;
+class _CheckboxFormFieldState<T> extends State<CheckboxFormField> {
+  final Map<T, bool> checkedValues = {};
+
+  getCheckedList() {
+    List<T> checkedList = [];
+
+    checkedValues.forEach((key, checked) {
+      if (checked) {
+        checkedList.add(key);
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    _selected = widget.defaultValue;
+    widget.selections.asMap().forEach((key, element) {
+      checkedValues[element.value] =
+          (widget.defaultValues.contains(element.value));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    List<LabeledRadio<T>> radios = [];
+    List<LabeledCheckbox> checkboxes = [];
     widget.selections.asMap().forEach(
       (index, LabelValue element) {
-        if (_selected == null && index == 0) {
-          _selected = element.value;
-        }
+        bool disabled = widget.disabled.contains(element.value);
 
-        radios.add(
-          LabeledRadio<T>(
-            label: element.label,
-            value: element.value,
-            groupValue: _selected,
-            disabled: (widget.disabled != null &&
-                widget.disabled.contains(element.value)),
-            labelStyle: widget.labelStyle,
-            onChanged: onChanged,
-            optional: element.optional,
-          ),
+        var checkbox = LabeledCheckbox(
+          label: element.label,
+          checked: checkedValues[element.value],
+          value: element.value,
+          disabled: disabled,
+          labelStyle: widget.labelStyle,
+          onChanged: onChanged,
+          optional: element.optional,
         );
+
+        checkboxes.add(checkbox);
       },
     );
 
@@ -124,19 +132,19 @@ class _RadioFormFieldState<T> extends State<RadioFormField> {
       margin: widget.margin,
       child: widget.orientation == SelectionsOrientationDefine.HORIZONTAL
           ? Row(
-              children: radios,
+              children: checkboxes,
             )
           : Column(
-              children: radios,
+              children: checkboxes,
             ),
     );
   }
 
-  void onChanged(T newValue) {
+  void onChanged(T value, bool newValue) {
     setState(() {
-      _selected = newValue;
+      checkedValues[value] = newValue;
       if (widget.onChange != null) {
-        widget.onChange(newValue);
+        widget.onChange(value, newValue, checkedValues);
       }
     });
   }

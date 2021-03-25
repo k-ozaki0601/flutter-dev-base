@@ -1,5 +1,6 @@
 library widget;
 
+export 'controls/selections_orientation_define.dart';
 export 'controls/text_form_field_ex.dart';
 export 'controls/alphanum_text_form_field.dart';
 export 'controls/alphanum_symbol_text_form_field.dart';
@@ -15,3 +16,4 @@ export 'controls/datepicker_form_field.dart';
 export 'controls/phone_text_form_field.dart';
 export 'controls/textarea_form_field.dart';
 export 'controls/radio_form_field.dart';
+export 'controls/checkbox_form_field.dart';
