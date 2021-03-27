@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_validation/base/model/label_value.dart';
 import 'package:intl/intl.dart';
-import 'base/validation/validator_builder.dart';
 import 'base/widget/widget.dart';
 import 'base/model/label_value.dart';
 
@@ -338,6 +337,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 TextButton(
                   onPressed: () {
                     var valid = _formKey.currentState.validate();
+                    print(valid);
                   },
                   child: Text('Do Validate!'),
                 ),

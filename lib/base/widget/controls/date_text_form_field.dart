@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'config.dart';
 import '../../../base/extensions/input_decoration.dart';
 import '../../../base/extensions/datetime.dart';
-import '../../../base/validation/validator_builder.dart';
+import 'validation/validator_builder.dart';
 
 class DateTextFormField extends StatefulWidget {
   DateTextFormField({

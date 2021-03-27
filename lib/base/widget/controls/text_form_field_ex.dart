@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'config.dart';
 import '../../../base/extensions/input_decoration.dart';
-import '../../../base/validation/validator_builder.dart';
+import 'validation/validator_builder.dart';
 
 class TextFormFieldEx extends TextFormField {
   TextFormFieldEx({

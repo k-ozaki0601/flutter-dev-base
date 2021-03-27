@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sprintf/sprintf.dart';
 import '../../../base/model/label_value.dart';
-import '../../../base/validation/validator_builder.dart';
+import 'validation/validator_builder.dart';
 
 class DropdownButtonFormFieldEx<String> extends DropdownButtonFormField {
   factory DropdownButtonFormFieldEx({

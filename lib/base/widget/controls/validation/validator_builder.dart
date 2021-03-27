@@ -1,6 +1,6 @@
 import 'form_validator_locale.dart';
 import 'i18n/all.dart';
-import '../extensions/string.dart';
+import '../../../extensions/string.dart';
 
 typedef StringValidationCallback = String Function(String value);
 
