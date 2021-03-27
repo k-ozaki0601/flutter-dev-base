@@ -5,6 +5,7 @@ extension InputDecorationExt on InputDecoration {
     if (config == null) {
       return this;
     }
+
     return this.copyWith(labelText: this.labelText + (config['required'] ? ' *' : ''));
   }
 }

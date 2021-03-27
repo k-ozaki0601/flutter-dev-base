@@ -23,15 +23,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  form_validator: ^0.1.7
+  sprintf: "^5.0.0"
   font_awesome_flutter: ^8.11.0
   intl: ^0.17.0
+  cupertino_icons: ^1.0.2
+  form_validator: ^0.1.7
   date_field: ^2.0.0
   flutter_localizations:
     sdk: flutter
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
   grouped_buttons: ^1.0.4
 
 dev_dependencies:

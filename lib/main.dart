@@ -322,6 +322,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   defaultValues: ["1"],
                   disabled: ["1"],
                 ),
+                DropdownButtonFormFieldEx(
+                  labelText: "性別",
+                  items: genders,
+                  required: true,
+                  onChanged: (newVal) {
+                    setState(() {
+                      print(newVal);
+                    });
+                  },
+                ),
                 SizedBox(
                   height: 30,
                 ),

@@ -102,9 +102,10 @@ class ValidationBuilder {
   /// Value must not be empty or null
   ValidationBuilder required([String message]) {
     _required = true;
-    return add(
-        (v) => (v?.isEmpty ?? true) ? message ?? _locale.required() : null);
+    return add(requiredValidator(message));
+        // (v) => (v?.isEmpty ?? true) ? message ?? _locale.required() : null);
   }
+  Function requiredValidator([String message]) => (v) => (v?.isEmpty ?? true) ? message ?? _locale.required() : null;
 
   /// Value length must be greater than or equal to [minLength]
   ValidationBuilder minLength(int minLength, [String message]) =>
