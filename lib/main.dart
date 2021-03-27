@@ -161,7 +161,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 PasswordTextFormField(
-                  validationBuilder: ValidationBuilder().required(),
                   decoration: InputDecoration(
                     hintText: 'password',
                     labelText: 'パスワード',
@@ -307,10 +306,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     labelText: 'より小さい または　等しい',
                   ),
                 ),
-                InputDatePickerFormField(
-                  firstDate: DateTime(2019),
-                  lastDate: DateTime(2020, 12, 12),
-                ),
+                // InputDatePickerFormField(
+                //   firstDate: DateTime(2019),
+                //   lastDate: DateTime(2020, 12, 12),
+                // ),
                 RadioFormField<String>(
                   selections: genders,
                   disabled: [],
@@ -324,7 +323,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 DropdownButtonFormFieldEx(
                   labelText: "性別",
                   items: genders,
-                  required: true,
                   onChanged: (newVal) {
                     setState(() {
                       print(newVal);

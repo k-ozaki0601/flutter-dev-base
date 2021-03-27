@@ -69,7 +69,7 @@ class DropdownButtonFormFieldEx<String> extends DropdownButtonFormField {
       dropdownColor: dropdownColor,
       decoration: decoration,
       onSaved: onSaved,
-      validator: ValidationBuilder().requiredValidator(),
+      validator: required ? ValidationBuilder().requiredValidator() : null,
     );
   }
 

@@ -103,9 +103,11 @@ class ValidationBuilder {
   ValidationBuilder required([String message]) {
     _required = true;
     return add(requiredValidator(message));
-        // (v) => (v?.isEmpty ?? true) ? message ?? _locale.required() : null);
+    // (v) => (v?.isEmpty ?? true) ? message ?? _locale.required() : null);
   }
-  Function requiredValidator([String message]) => (v) => (v?.isEmpty ?? true) ? message ?? _locale.required() : null;
+
+  Function requiredValidator([String message]) =>
+      (v) => (v?.isEmpty ?? true) ? message ?? _locale.required() : null;
 
   /// Value length must be greater than or equal to [minLength]
   ValidationBuilder minLength(int minLength, [String message]) =>
@@ -204,11 +206,11 @@ class ValidationBuilder {
           : message ?? _locale.email(v));
 
   /// Value must be a well formatted phone number
-  ValidationBuilder phone([String message]) =>
-      add((v) => !_anyLetter.hasMatch(v) &&
-              _phoneRegExp.hasMatch(v.replaceAll(_nonDigitsExp, ''))
-          ? null
-          : message ?? _locale.phoneNumber(v));
+  ValidationBuilder phone([String message]) => add((v) => (v.isEmptyOrNull() ||
+          (!_anyLetter.hasMatch(v) &&
+              _phoneRegExp.hasMatch(v.replaceAll(_nonDigitsExp, ''))))
+      ? null
+      : message ?? _locale.phoneNumber(v));
 
   /// Value must be a well formatted IPv4 address
   ValidationBuilder ip([String message]) =>
@@ -262,5 +264,7 @@ class ValidationBuilder {
 
   /// Value must be a date
   ValidationBuilder date([String message]) =>
-      add((v) => DateTime.tryParse(v) == null ? _locale.date(v) : message);
+      add((v) => (v.isNotEmptyOrNull() && DateTime.tryParse(v) == null)
+          ? message ?? _locale.date(v)
+          : null);
 }
