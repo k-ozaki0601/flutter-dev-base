@@ -56,10 +56,10 @@ class PhoneTextFormField extends TextFormField {
   }) : super(
           key: key,
           controller: controller,
-          initialValue:
-              controller != null ? controller.text : (initialValue ?? ''),
+          initialValue: initialValue,
           focusNode: focusNode,
-          decoration: decoration.from({'required': required, 'hintText': 'ハイフンなし'}),
+          decoration:
+              decoration.from({'required': required, 'hintText': 'ハイフンなし'}),
           keyboardType: TextInputType.number,
           textCapitalization: textCapitalization,
           textInputAction: textInputAction ?? config['textInputAction'],

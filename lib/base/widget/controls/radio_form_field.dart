@@ -2,24 +2,24 @@ import 'package:flutter/material.dart';
 import '../../model/label_value.dart';
 import 'selections_orientation_define.dart';
 
-class LabeledRadio<T> extends StatelessWidget {
+class LabeledRadio extends StatelessWidget {
   final String label;
-  final EdgeInsets padding;
-  final T groupValue;
-  final T value;
+  final String groupValue;
+  final String value;
   final bool disabled;
   final TextStyle labelStyle;
+  final EdgeInsets padding;
   final Function onChanged;
   final Map optional;
 
   const LabeledRadio({
     Key key,
     this.label,
-    this.padding = const EdgeInsets.symmetric(horizontal: 5.0),
     this.groupValue,
     this.value,
     this.disabled,
     this.labelStyle,
+    this.padding = const EdgeInsets.symmetric(horizontal: 5.0),
     this.onChanged,
     this.optional,
   }) : super(key: key);
@@ -47,8 +47,13 @@ class LabeledRadio<T> extends StatelessWidget {
               value: value,
               onChanged: disabled
                   ? null
-                  : (T newValue) {
-                      onChanged(newValue);
+                  : (String newValue) {
+                      var selectedElement = LabelValue(
+                        label: label,
+                        value: value,
+                        optional: optional,
+                      );
+                      onChanged(newValue, selectedElement);
                     },
             ),
             Text(label, style: textLabelStyle),
@@ -59,11 +64,11 @@ class LabeledRadio<T> extends StatelessWidget {
   }
 }
 
-class RadioFormField<T> extends StatefulWidget {
-  final List<LabelValue<T>> selections;
-  final List<T> disabled;
-  final T defaultValue;
-  final void Function(T value) onChange;
+class RadioFormField extends StatefulWidget {
+  final List<LabelValue> selections;
+  final List<String> disabled;
+  final String defaultValue;
+  final void Function(LabelValue value) onChange;
   final TextStyle labelStyle;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry margin;
@@ -82,30 +87,39 @@ class RadioFormField<T> extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _RadioFormFieldState<T> createState() => _RadioFormFieldState();
+  _RadioFormFieldState createState() => _RadioFormFieldState();
 }
 
-class _RadioFormFieldState<T> extends State<RadioFormField> {
-  T _selected;
-  LabeledRadio _selectedElement;
+class _RadioFormFieldState extends State<RadioFormField> {
+  String _selected;
 
   @override
   void initState() {
     super.initState();
-    _selected = widget.defaultValue;
+    _selected = widget.defaultValue == null
+        ? widget.selections[0].value
+        : widget.defaultValue;
+
+    if (widget.onChange != null) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        for (int i = 0; i < widget.selections.length; i++) {
+          if (widget.selections[i].value == widget.defaultValue) {
+            _selected = widget.selections[i].value;
+            widget.onChange(widget.selections[i]);
+            break;
+          }
+        }
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    List<LabeledRadio<T>> radios = [];
+    List<LabeledRadio> radios = [];
     widget.selections.asMap().forEach(
       (index, LabelValue element) {
-        if (_selected == null && index == 0) {
-          _selected = element.value;
-        }
-
         radios.add(
-          LabeledRadio<T>(
+          LabeledRadio(
             label: element.label,
             value: element.value,
             groupValue: _selected,
@@ -132,11 +146,11 @@ class _RadioFormFieldState<T> extends State<RadioFormField> {
     );
   }
 
-  void onChanged(T newValue) {
+  void onChanged(String newValue, LabelValue selectedElement) {
     setState(() {
       _selected = newValue;
       if (widget.onChange != null) {
-        widget.onChange(newValue);
+        widget.onChange(selectedElement);
       }
     });
   }

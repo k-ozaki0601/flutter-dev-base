@@ -6,7 +6,7 @@ export 'controls/checkbox_form_field.dart';
 export 'controls/date_text_form_field.dart';
 export 'controls/datepicker_form_field.dart';
 export 'controls/digits_text_form_field.dart';
-export 'controls/dropdown_button_form_field.dart';
+export 'controls/dropdown_button_form_field_ex.dart';
 export 'controls/email_text_form_field.dart';
 export 'controls/integer_text_form_field.dart';
 export 'controls/number_text_form_field.dart';

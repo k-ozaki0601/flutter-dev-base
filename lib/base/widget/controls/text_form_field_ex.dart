@@ -58,8 +58,7 @@ class TextFormFieldEx extends TextFormField {
   }) : super(
           key: key,
           controller: controller,
-          initialValue:
-              controller != null ? controller.text : (initialValue ?? ''),
+          initialValue: initialValue,
           focusNode: focusNode,
           decoration: decoration.from({'required': required}),
           keyboardType: keyboardType,

@@ -1,11 +1,11 @@
-class LabelValue<T> {
+class LabelValue {
   LabelValue({
     this.label,
     this.value,
-    this.optional,
+    this.optional = const {},
   });
 
   final String label;
-  final T value;
+  final String value;
   final Map optional;
 }

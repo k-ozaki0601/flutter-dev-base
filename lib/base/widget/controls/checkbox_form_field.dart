@@ -3,24 +3,24 @@ import 'package:flutter_validation/base/widget/controls/selections_orientation_d
 import '../../model/label_value.dart';
 import 'selections_orientation_define.dart';
 
-class LabeledCheckbox<T> extends StatelessWidget {
+class LabeledCheckbox extends StatelessWidget {
   final String label;
-  final EdgeInsets padding;
   final bool checked;
-  final T value;
+  final String value;
   final bool disabled;
   final TextStyle labelStyle;
+  final EdgeInsets padding;
   final Function onChanged;
   final Map optional;
 
   const LabeledCheckbox({
     Key key,
     this.label,
-    this.padding = const EdgeInsets.symmetric(horizontal: 5.0),
     this.checked,
     this.value,
     this.disabled,
     this.labelStyle,
+    this.padding = const EdgeInsets.symmetric(horizontal: 5.0),
     this.onChanged,
     this.optional,
   }) : super(key: key);
@@ -45,8 +45,13 @@ class LabeledCheckbox<T> extends StatelessWidget {
               value: checked,
               onChanged: disabled
                   ? null
-                  : (bool newValue) {
-                      onChanged(value, newValue);
+                  : (bool checked) {
+                      var checkedElement = LabelValue(
+                        label: label,
+                        value: value,
+                        optional: optional,
+                      );
+                      onChanged(checked, value, checkedElement);
                     },
             ),
             Text(label, style: textLabelStyle),
@@ -57,12 +62,11 @@ class LabeledCheckbox<T> extends StatelessWidget {
   }
 }
 
-class CheckboxFormField<T> extends StatefulWidget {
-  final List<LabelValue<T>> selections;
-  final List<T> defaultValues;
-  final List<T> disabled;
-  final void Function(T value, bool checked, Map<T, bool> checkedValues)
-      onChange;
+class CheckboxFormField extends StatefulWidget {
+  final List<LabelValue> selections;
+  final List<String> defaultValues;
+  final List<String> disabled;
+  final void Function(List<LabelValue> choices) onChange;
   final TextStyle labelStyle;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry margin;
@@ -81,29 +85,26 @@ class CheckboxFormField<T> extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CheckboxFormFieldState<T> createState() => _CheckboxFormFieldState();
+  _CheckboxFormFieldState createState() => _CheckboxFormFieldState();
 }
 
-class _CheckboxFormFieldState<T> extends State<CheckboxFormField> {
-  final Map<T, bool> checkedValues = {};
-
-  getCheckedList() {
-    List<T> checkedList = [];
-
-    checkedValues.forEach((key, checked) {
-      if (checked) {
-        checkedList.add(key);
-      }
-    });
-  }
+class _CheckboxFormFieldState extends State<CheckboxFormField> {
+  final Map<String, Map<String, Object>> _checkedValues = {};
 
   @override
   void initState() {
     super.initState();
-    widget.selections.asMap().forEach((key, element) {
-      checkedValues[element.value] =
-          (widget.defaultValues.contains(element.value));
+    widget.selections.forEach((element) {
+      _checkedValues[element.value] = {};
+      _checkedValues[element.value]['checked'] =
+          widget.defaultValues.contains(element.value);
+      _checkedValues[element.value]['element'] = element;
     });
+
+    if (widget.onChange != null) {
+      WidgetsBinding.instance
+          .addPostFrameCallback((timeStamp) => {widget.onChange(_choices())});
+    }
   }
 
   @override
@@ -115,7 +116,7 @@ class _CheckboxFormFieldState<T> extends State<CheckboxFormField> {
 
         var checkbox = LabeledCheckbox(
           label: element.label,
-          checked: checkedValues[element.value],
+          checked: _checkedValues[element.value]['checked'],
           value: element.value,
           disabled: disabled,
           labelStyle: widget.labelStyle,
@@ -140,12 +141,23 @@ class _CheckboxFormFieldState<T> extends State<CheckboxFormField> {
     );
   }
 
-  void onChanged(T value, bool newValue) {
+  void onChanged(bool checked, String value, LabelValue checkedElement) {
     setState(() {
-      checkedValues[value] = newValue;
+      _checkedValues[value]['checked'] = checked;
       if (widget.onChange != null) {
-        widget.onChange(value, newValue, checkedValues);
+        widget.onChange(_choices());
       }
     });
+  }
+
+  List<LabelValue> _choices() {
+    List<LabelValue> choices = [];
+    _checkedValues.forEach((key, value) {
+      if (value['checked']) {
+        choices.add(value['element']);
+      }
+    });
+
+    return choices;
   }
 }

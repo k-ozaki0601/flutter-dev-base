@@ -8,6 +8,7 @@ import 'validation/validator_builder.dart';
 class PasswordTextFormField extends StatefulWidget {
   PasswordTextFormField({
     this.key,
+    this.controller,
     this.initialValue,
     this.focusNode,
     this.decoration = const InputDecoration(),
@@ -57,6 +58,7 @@ class PasswordTextFormField extends StatefulWidget {
   });
 
   final Key key;
+  final TextEditingController controller;
   final String initialValue;
   final FocusNode focusNode;
   final InputDecoration decoration;
@@ -134,6 +136,7 @@ class _PasswordTextFormFieldState extends State<PasswordTextFormField> {
 
     return TextFormField(
       key: widget.key,
+      controller: widget.controller,
       initialValue: widget.initialValue,
       focusNode: widget.focusNode,
       decoration: decoration.from({'required': widget.required}),

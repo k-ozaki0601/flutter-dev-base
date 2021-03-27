@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_validation/base/model/label_value.dart';
 import 'package:intl/intl.dart';
+import 'package:sprintf/sprintf.dart';
 import 'base/widget/widget.dart';
 import 'base/model/label_value.dart';
+import 'base/extensions/string.dart';
 
 void main() {
   Intl.defaultLocale = 'ja_JP';
@@ -62,18 +64,48 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final _formKey = GlobalKey<FormState>();
   bool _showPassword = false;
+  LabelValue _radioSelected;
+  List<LabelValue> _choices = [];
+  String _selectedValue = "1";
 
   @override
   Widget build(BuildContext context) {
-    List<LabelValue<String>> genders = [];
-    genders.add(LabelValue<String>(
+    List<LabelValue> genders = [];
+    genders.add(LabelValue(
       label: "男",
       value: "1",
     ));
-    genders.add(LabelValue<String>(
+    genders.add(LabelValue(
       label: "女",
       value: "2",
     ));
+
+    List<DropdownMenuItem<String>> dropdownItems = [];
+    genders.forEach((element) {
+      dropdownItems.add(DropdownMenuItem<String>(
+        value: element.value,
+        child: Text(element.label),
+      ));
+    });
+
+    Map<String, TextEditingController> formControllers = {
+      'required': TextEditingController(text: "hello"),
+      'email': TextEditingController(text: 'ozaki@elseif.jp'),
+      'numberText': TextEditingController(text: '1.25'),
+      'positiveText': TextEditingController(text: '1'),
+      'integerText': TextEditingController(text: '-100'),
+      'digitText': TextEditingController(text: '10'),
+      'alphanumText': TextEditingController(text: 'abc123'),
+      'alphanumSymbolText': TextEditingController(text: 'abc123##'),
+      'passwordText': TextEditingController(text: 'password'),
+      'urlText': TextEditingController(text: 'https://www.yahoo.co.jp'),
+      'dateText': TextEditingController(text: ''),
+      'datepicker': TextEditingController(),
+      'timepicker': TextEditingController(),
+      'datetimePicker': TextEditingController(),
+      'phoneText': TextEditingController(text: '09099999999'),
+      'textarea': TextEditingController(text: 'aaa'),
+    };
 
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
@@ -112,67 +144,78 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 TextFormFieldEx(
-                  validationBuilder: ValidationBuilder().required(),
+                  controller: formControllers['required'],
+                  required: true,
                   decoration: InputDecoration(
                     hintText: 'required',
                     labelText: '必須項目',
                   ),
                 ),
                 EmailTextFormField(
+                  controller: formControllers['email'],
                   decoration: InputDecoration(
                     hintText: 'email',
                     labelText: 'メールアドレス',
                   ),
                 ),
                 NumberTextFormField(
+                  controller: formControllers['numberText'],
                   decoration: InputDecoration(
                     hintText: 'number',
                     labelText: '小数',
                   ),
                 ),
                 PositiveIntegerTextFormField(
+                  controller: formControllers['positiveText'],
                   decoration: InputDecoration(
                     hintText: 'positive integer',
                     labelText: '正の数値',
                   ),
                 ),
                 IntegerTextFormField(
+                  controller: formControllers['integerText'],
                   decoration: InputDecoration(
                     hintText: 'integer',
                     labelText: '整数',
                   ),
                 ),
                 DigitsTextFormField(
+                  controller: formControllers['digitText'],
                   decoration: InputDecoration(
                     hintText: 'digits',
                     labelText: '数値',
                   ),
                 ),
                 AlphanumTextFormField(
+                  controller: formControllers['alphanumText'],
                   decoration: InputDecoration(
                     hintText: 'alphanum',
                     labelText: '英数',
                   ),
                 ),
                 AlphanumSymbolTextFormField(
+                  controller: formControllers['alphanumSymbolText'],
                   decoration: InputDecoration(
                     hintText: 'alphanum',
                     labelText: '英数記号',
                   ),
                 ),
                 PasswordTextFormField(
+                  controller: formControllers['passwordText'],
                   decoration: InputDecoration(
                     hintText: 'password',
                     labelText: 'パスワード',
                   ),
                 ),
                 UrlTextFormField(
+                  controller: formControllers['urlText'],
                   decoration: InputDecoration(
                     hintText: 'url',
                     labelText: 'URL',
                   ),
                 ),
                 DateTextFormField(
+                  controller: formControllers['dateText'],
                   decoration: InputDecoration(
                     hintText: 'date',
                     labelText: 'Date',
@@ -200,11 +243,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 PhoneTextFormField(
+                  controller: formControllers['phoneText'],
                   decoration: InputDecoration(
                     labelText: 'phone number',
                   ),
                 ),
                 TextareaFormField(
+                  controller: formControllers['textarea'],
                   decoration: InputDecoration(
                     hintText: 'textarea',
                     labelText: 'textarea',
@@ -310,22 +355,29 @@ class _MyHomePageState extends State<MyHomePage> {
                 //   firstDate: DateTime(2019),
                 //   lastDate: DateTime(2020, 12, 12),
                 // ),
-                RadioFormField<String>(
+                RadioFormField(
                   selections: genders,
                   disabled: [],
                   defaultValue: "2",
+                  onChange: (LabelValue selected) => setState(() {
+                    _radioSelected = selected;
+                  }),
                 ),
-                CheckboxFormField<String>(
-                  selections:genders,
+                CheckboxFormField(
+                  selections: genders,
                   defaultValues: ["1"],
                   disabled: ["1"],
+                  onChange: (List<LabelValue> selected) => setState(() {
+                    _choices = selected;
+                  }),
                 ),
                 DropdownButtonFormFieldEx(
                   labelText: "性別",
-                  items: genders,
+                  items: dropdownItems,
+                  value: _selectedValue,
                   onChanged: (newVal) {
                     setState(() {
-                      print(newVal);
+                      _selectedValue = newVal;
                     });
                   },
                 ),
@@ -334,8 +386,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    var valid = _formKey.currentState.validate();
-                    print(valid);
+                    bool valid = _formKey.currentState.validate();
+                    if (!valid) {
+                      print('has error');
+                      return;
+                    }
+
+                    formControllers.forEach((key, value) {
+                      print(sprintf("%s = %s, %d, %f", [
+                        key,
+                        value.text,
+                        value.text.toInt(),
+                        value.text.toDouble()
+                      ]));
+                    });
+                    print(sprintf("radio: %s", [_radioSelected.value]));
+                    print('checkbox --');
+                    _choices.forEach((element) {
+                      print(element.value);
+                    });
+                    print(sprintf("dropdown: %s", [_selectedValue]));
                   },
                   child: Text('Do Validate!'),
                 ),
