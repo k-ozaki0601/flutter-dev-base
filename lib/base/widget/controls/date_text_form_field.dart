@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'config.dart';
-import '../../../base/validation/validator_builder.dart';
+import '../../../base/extensions/input_decoration.dart';
+import '../../../base/extensions/datetime.dart';
+import 'validation/validator_builder.dart';
 
 class DateTextFormField extends StatefulWidget {
   DateTextFormField({
@@ -11,7 +12,6 @@ class DateTextFormField extends StatefulWidget {
     this.initialValue,
     this.focusNode,
     this.decoration = const InputDecoration(),
-    this.keyboardType,
     this.textCapitalization = TextCapitalization.none,
     this.textInputAction,
     this.style,
@@ -29,21 +29,12 @@ class DateTextFormField extends StatefulWidget {
     this.smartDashesType,
     this.smartQuotesType,
     this.enableSuggestions = true,
-    @Deprecated('Use autovalidateMode parameter which provide more specific '
-        'behaviour related to auto validation. '
-        'This feature was deprecated after v1.19.0.')
-        this.autovalidate = false,
-    @Deprecated(
-        'Use maxLengthEnforcement parameter which provides more specific '
-        'behavior related to the maxLength limit. '
-        'This feature was deprecated after v1.25.0-5.0.pre.')
-        this.maxLengthEnforced = true,
     this.maxLengthEnforcement,
     this.maxLines = 1,
     this.minLines,
     this.expands = false,
-    this.maxLength,
-    this.onChanged,
+    // this.maxLength,
+    // this.onChanged,
     this.onTap,
     this.onEditingComplete,
     this.onFieldSubmitted,
@@ -62,14 +53,16 @@ class DateTextFormField extends StatefulWidget {
     this.scrollPhysics,
     this.autofillHints,
     this.autovalidateMode,
+    this.required = false,
     this.validationBuilder,
-  }) : super(key: key);
+    TextEditingController controller,
+  }) : _controller = controller ??
+            (controller == null ? TextEditingController() : controller);
 
   final Key key;
   final String initialValue;
   final FocusNode focusNode;
   final InputDecoration decoration;
-  final TextInputType keyboardType;
   final TextCapitalization textCapitalization;
   final TextInputAction textInputAction;
   final TextStyle style;
@@ -87,14 +80,14 @@ class DateTextFormField extends StatefulWidget {
   final SmartDashesType smartDashesType;
   final SmartQuotesType smartQuotesType;
   final bool enableSuggestions;
-  final bool autovalidate;
-  final bool maxLengthEnforced;
   final MaxLengthEnforcement maxLengthEnforcement;
   final int maxLines;
   final int minLines;
   final bool expands;
-  final int maxLength;
-  final ValueChanged<String> onChanged;
+
+  // final int maxLength;
+
+  // final ValueChanged<String> onChanged;
   final GestureTapCallback onTap;
   final VoidCallback onEditingComplete;
   final ValueChanged<String> onFieldSubmitted;
@@ -113,46 +106,56 @@ class DateTextFormField extends StatefulWidget {
   final ScrollPhysics scrollPhysics;
   final Iterable<String> autofillHints;
   final AutovalidateMode autovalidateMode;
+  final bool required;
   final ValidationBuilder validationBuilder;
+  final TextEditingController _controller;
 
   @override
-  _DateTextFormFieldState createState() => _DateTextFormFieldState();
+  _DateTextFormFieldState createState() =>
+      _DateTextFormFieldState(controller: _controller);
 }
 
 class _DateTextFormFieldState extends State<DateTextFormField> {
+  _DateTextFormFieldState({this.controller}) : super();
+
   final iconFocusNode = FocusNode(skipTraversal: true);
+  final TextEditingController controller;
+  DateTime selectedDate = DateTime.now();
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        currentDate: selectedDate,
+        firstDate: DateTime(1900, 1),
+        lastDate: DateTime(2100));
+    if (picked != null && picked != selectedDate) {
+      controller.text = picked.format(DateFormatDefine.yMd);
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    DateTime selectedDate = DateTime.now();
-
-    Future<void> _selectDate(BuildContext context) async {
-      final DateTime picked = await showDatePicker(
-          context: context,
-          initialDate: selectedDate,
-          firstDate: DateTime(2015, 8),
-          lastDate: DateTime(2101));
-      if (picked != null && picked != selectedDate)
-        setState(() {
-          selectedDate = picked;
-        });
-    }
-
     InputDecoration decoration = widget.decoration.copyWith(
-        suffixIcon: IconButton(
-      focusNode: iconFocusNode,
-      icon: Icon(FontAwesomeIcons.calendar),
-      onPressed: () => _selectDate(context),
-    ));
+      suffixIcon: IconButton(
+        focusNode: iconFocusNode,
+        icon: Icon(FontAwesomeIcons.calendar),
+        onPressed: () => _selectDate(context),
+      ),
+    );
 
-    return DateInputField(
+    return TextFormField(
       key: widget.key,
+      controller: controller,
       initialValue: widget.initialValue,
       focusNode: widget.focusNode,
-      decoration: decoration,
-      keyboardType: widget.keyboardType,
+      decoration: decoration.from({'required': widget.required}),
+      keyboardType: TextInputType.visiblePassword,
       textCapitalization: widget.textCapitalization,
-      textInputAction: widget.textInputAction,
+      textInputAction: widget.textInputAction ?? config['textInputAction'],
       style: widget.style,
       strutStyle: widget.strutStyle,
       textDirection: widget.textDirection,
@@ -168,14 +171,33 @@ class _DateTextFormFieldState extends State<DateTextFormField> {
       smartDashesType: widget.smartDashesType,
       smartQuotesType: widget.smartQuotesType,
       enableSuggestions: widget.enableSuggestions,
-      autovalidate: widget.autovalidate,
-      maxLengthEnforced: widget.maxLengthEnforced,
       maxLengthEnforcement: widget.maxLengthEnforcement,
       maxLines: widget.maxLines,
       minLines: widget.minLines,
       expands: widget.expands,
-      maxLength: widget.maxLength,
-      onChanged: widget.onChanged,
+      maxLength: 10,
+      //widget.maxLength,
+      // onChanged: widget.onChanged,
+      onChanged: (text) {
+        String value = text.replaceAll(RegExp(r'[/]'), '');
+        DateTime dt = DateTime.tryParse(value);
+        if (dt == null) {
+          var values = text.split("/");
+          if (values.length != 3) {
+            return;
+          }
+          dt = DateTime.tryParse(
+              "${values[0]}${values[1].padLeft(2, "0")}${values[2].padLeft(2, "0")}");
+          if (dt == null) {
+            return;
+          }
+        }
+
+        controller.text = dt.format(DateFormatDefine.yMd);
+        setState(() {
+          selectedDate = dt;
+        });
+      },
       onTap: widget.onTap,
       onEditingComplete: widget.onEditingComplete,
       onFieldSubmitted: widget.onFieldSubmitted,
@@ -194,259 +216,10 @@ class _DateTextFormFieldState extends State<DateTextFormField> {
       scrollPhysics: widget.scrollPhysics,
       autofillHints: widget.autofillHints,
       autovalidateMode: widget.autovalidateMode,
-      validationBuilder: widget.validationBuilder,
+      validator: ValidationBuilder(required: widget.required)
+          .from(widget.validationBuilder)
+          .date()
+          .build(),
     );
-  }
-}
-
-class DateInputField extends FormField<String> {
-  DateInputField({
-    Key key,
-    this.controller,
-    String initialValue,
-    FocusNode focusNode,
-    InputDecoration decoration = const InputDecoration(),
-    TextInputType keyboardType,
-    TextCapitalization textCapitalization = TextCapitalization.none,
-    TextInputAction textInputAction,
-    TextStyle style,
-    StrutStyle strutStyle,
-    TextDirection textDirection,
-    TextAlign textAlign = TextAlign.start,
-    TextAlignVertical textAlignVertical,
-    bool autofocus = false,
-    bool readOnly = false,
-    ToolbarOptions toolbarOptions,
-    bool showCursor,
-    String obscuringCharacter = '•',
-    bool obscureText = false,
-    bool autocorrect = true,
-    SmartDashesType smartDashesType,
-    SmartQuotesType smartQuotesType,
-    bool enableSuggestions = true,
-    bool autovalidate = false,
-    bool maxLengthEnforced = true,
-    MaxLengthEnforcement maxLengthEnforcement,
-    int maxLines = 1,
-    int minLines,
-    bool expands = false,
-    int maxLength,
-    ValueChanged<String> onChanged,
-    GestureTapCallback onTap,
-    VoidCallback onEditingComplete,
-    ValueChanged<String> onFieldSubmitted,
-    FormFieldSetter<String> onSaved,
-    // FormFieldValidator<String> validator,
-    List<TextInputFormatter> inputFormatters,
-    bool enabled,
-    double cursorWidth = 2.0,
-    double cursorHeight,
-    Radius cursorRadius,
-    Color cursorColor,
-    Brightness keyboardAppearance,
-    EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
-    bool enableInteractiveSelection = true,
-    TextSelectionControls selectionControls,
-    InputCounterWidgetBuilder buildCounter,
-    ScrollPhysics scrollPhysics,
-    Iterable<String> autofillHints,
-    AutovalidateMode autovalidateMode,
-    ValidationBuilder validationBuilder,
-  })  : assert(initialValue == null || controller == null),
-        assert(textAlign != null),
-        assert(autofocus != null),
-        assert(readOnly != null),
-        assert(obscuringCharacter != null && obscuringCharacter.length == 1),
-        assert(obscureText != null),
-        assert(autocorrect != null),
-        assert(enableSuggestions != null),
-        assert(autovalidate != null),
-        assert(
-            autovalidate == false ||
-                autovalidate == true && autovalidateMode == null,
-            'autovalidate and autovalidateMode should not be used together.'),
-        assert(maxLengthEnforced != null),
-        assert(
-          maxLengthEnforced || maxLengthEnforcement == null,
-          'maxLengthEnforced is deprecated, use only maxLengthEnforcement',
-        ),
-        assert(scrollPadding != null),
-        assert(maxLines == null || maxLines > 0),
-        assert(minLines == null || minLines > 0),
-        assert(
-          (maxLines == null) || (minLines == null) || (maxLines >= minLines),
-          "minLines can't be greater than maxLines",
-        ),
-        assert(expands != null),
-        assert(
-          !expands || (maxLines == null && minLines == null),
-          'minLines and maxLines must be null when expands is true.',
-        ),
-        assert(!obscureText || maxLines == 1,
-            'Obscured fields cannot be multiline.'),
-        assert(maxLength == null || maxLength > 0),
-        assert(enableInteractiveSelection != null),
-        super(
-          key: key,
-          initialValue:
-              controller != null ? controller.text : (initialValue ?? ''),
-          onSaved: onSaved,
-          validator: (validationBuilder == null
-                  ? ValidationBuilder()
-                  : validationBuilder)
-              .build(),
-          enabled: enabled ?? decoration?.enabled ?? true,
-          autovalidateMode: autovalidate
-              ? AutovalidateMode.always
-              : (autovalidateMode ?? AutovalidateMode.disabled),
-          builder: (FormFieldState<String> field) {
-            final _PasswordInputFieldState state =
-                field as _PasswordInputFieldState;
-            final InputDecoration effectiveDecoration = (decoration ??
-                    const InputDecoration())
-                .applyDefaults(Theme.of(field.context).inputDecorationTheme);
-            void onChangedHandler(String value) {
-              field.didChange(value);
-              if (onChanged != null) {
-                onChanged(value);
-              }
-            }
-
-            return TextField(
-              controller: state._effectiveController,
-              focusNode: focusNode,
-              decoration:
-                  effectiveDecoration.copyWith(errorText: field.errorText),
-              keyboardType: keyboardType,
-              textInputAction: textInputAction == null
-                  ? config['textInputAction']
-                  : textInputAction,
-              style: style,
-              strutStyle: strutStyle,
-              textAlign: textAlign,
-              textAlignVertical: textAlignVertical,
-              textDirection: textDirection,
-              textCapitalization: textCapitalization,
-              autofocus: autofocus,
-              toolbarOptions: toolbarOptions,
-              readOnly: readOnly,
-              showCursor: showCursor,
-              obscuringCharacter: obscuringCharacter,
-              obscureText: obscureText,
-              autocorrect: autocorrect,
-              smartDashesType: smartDashesType ??
-                  (obscureText
-                      ? SmartDashesType.disabled
-                      : SmartDashesType.enabled),
-              smartQuotesType: smartQuotesType ??
-                  (obscureText
-                      ? SmartQuotesType.disabled
-                      : SmartQuotesType.enabled),
-              enableSuggestions: enableSuggestions,
-              maxLengthEnforced: maxLengthEnforced,
-              maxLengthEnforcement: maxLengthEnforcement,
-              maxLines: maxLines,
-              minLines: minLines,
-              expands: expands,
-              maxLength: maxLength,
-              onChanged: onChangedHandler,
-              onTap: onTap,
-              onEditingComplete: onEditingComplete,
-              onSubmitted: onFieldSubmitted,
-              inputFormatters: inputFormatters,
-              enabled: enabled ?? decoration?.enabled ?? true,
-              cursorWidth: cursorWidth,
-              cursorHeight: cursorHeight,
-              cursorRadius: cursorRadius,
-              cursorColor: cursorColor,
-              scrollPadding: scrollPadding,
-              scrollPhysics: scrollPhysics,
-              keyboardAppearance: keyboardAppearance,
-              enableInteractiveSelection: enableInteractiveSelection,
-              selectionControls: selectionControls,
-              buildCounter: buildCounter,
-              autofillHints: autofillHints,
-            );
-          },
-        );
-
-  /// Controls the text being edited.
-  ///
-  /// If null, this widget will create its own [TextEditingController] and
-  /// initialize its [TextEditingController.text] with [initialValue].
-  final TextEditingController controller;
-
-  @override
-  _PasswordInputFieldState createState() => _PasswordInputFieldState();
-}
-
-class _PasswordInputFieldState extends FormFieldState<String> {
-  TextEditingController _controller;
-
-  TextEditingController get _effectiveController =>
-      widget.controller ?? _controller;
-
-  @override
-  DateInputField get widget => super.widget as DateInputField;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.controller == null) {
-      _controller = TextEditingController(text: widget.initialValue);
-    } else {
-      widget.controller.addListener(_handleControllerChanged);
-    }
-  }
-
-  @override
-  void didUpdateWidget(DateInputField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.controller != oldWidget.controller) {
-      oldWidget.controller?.removeListener(_handleControllerChanged);
-      widget.controller?.addListener(_handleControllerChanged);
-
-      if (oldWidget.controller != null && widget.controller == null)
-        _controller =
-            TextEditingController.fromValue(oldWidget.controller.value);
-      if (widget.controller != null) {
-        setValue(widget.controller.text);
-        if (oldWidget.controller == null) _controller = null;
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.controller?.removeListener(_handleControllerChanged);
-    super.dispose();
-  }
-
-  @override
-  void didChange(String value) {
-    super.didChange(value);
-
-    if (_effectiveController.text != value)
-      _effectiveController.text = value ?? '';
-  }
-
-  @override
-  void reset() {
-    // setState will be called in the superclass, so even though state is being
-    // manipulated, no setState call is needed here.
-    _effectiveController.text = widget.initialValue ?? '';
-    super.reset();
-  }
-
-  void _handleControllerChanged() {
-    // Suppress changes that originated from within this class.
-    //
-    // In the case where a controller has been passed in to this widget, we
-    // register this change listener. In these cases, we'll also receive change
-    // notifications for changes originating from within this class -- for
-    // example, the reset() method. In such cases, the FormField value will
-    // already have been set.
-    if (_effectiveController.text != value)
-      didChange(_effectiveController.text);
   }
 }

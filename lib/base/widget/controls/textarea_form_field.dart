@@ -4,8 +4,8 @@ import 'config.dart';
 import '../../../base/extensions/input_decoration.dart';
 import 'validation/validator_builder.dart';
 
-class PositiveIntegerTextFormField extends TextFormField {
-  PositiveIntegerTextFormField({
+class TextareaFormField extends TextFormField {
+  TextareaFormField({
     Key key,
     TextEditingController controller,
     String initialValue,
@@ -16,7 +16,7 @@ class PositiveIntegerTextFormField extends TextFormField {
     TextStyle style,
     StrutStyle strutStyle,
     TextDirection textDirection,
-    TextAlign textAlign = TextAlign.right,
+    TextAlign textAlign = TextAlign.start,
     TextAlignVertical textAlignVertical,
     bool autofocus = false,
     bool readOnly = false,
@@ -29,7 +29,7 @@ class PositiveIntegerTextFormField extends TextFormField {
     SmartQuotesType smartQuotesType,
     bool enableSuggestions = true,
     MaxLengthEnforcement maxLengthEnforcement,
-    int maxLines = 1,
+    int maxLines,
     int minLines,
     bool expands = false,
     int maxLength,
@@ -60,7 +60,7 @@ class PositiveIntegerTextFormField extends TextFormField {
           initialValue: initialValue,
           focusNode: focusNode,
           decoration: decoration.from({'required': required}),
-          keyboardType: TextInputType.number,
+          keyboardType: TextInputType.multiline,
           textCapitalization: textCapitalization,
           textInputAction: textInputAction ?? config['textInputAction'],
           style: style,
@@ -90,8 +90,6 @@ class PositiveIntegerTextFormField extends TextFormField {
           onSaved: onSaved,
           validator: ValidationBuilder(required: required)
               .from(validationBuilder)
-              .min(1)
-              .integer()
               .build(),
           inputFormatters: inputFormatters,
           enabled: enabled,

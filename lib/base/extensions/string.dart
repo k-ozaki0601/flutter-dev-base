@@ -15,4 +15,8 @@ extension StringExt on String {
   bool isNotEmptyOrNull() {
     return !(this?.isEmpty ?? true);
   }
+
+  int toInt() => toDouble().toInt();
+
+  double toDouble() => double.tryParse(this) != null ? double.parse(this) : 0;
 }

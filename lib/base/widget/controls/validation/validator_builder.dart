@@ -1,6 +1,6 @@
 import 'form_validator_locale.dart';
 import 'i18n/all.dart';
-import '../extensions/string.dart';
+import '../../../extensions/string.dart';
 
 typedef StringValidationCallback = String Function(String value);
 
@@ -11,8 +11,10 @@ class ValidationBuilder {
   ValidationBuilder({
     String localeName,
     FormValidatorLocale locale,
-  }) : _locale = locale ??
-            (localeName == null ? globalLocale : createLocale(localeName)) {
+    bool required = false,
+  })  : _locale = locale ??
+            (localeName == null ? globalLocale : createLocale(localeName)),
+        _required = required {
     ArgumentError.checkNotNull(_locale, 'locale');
   }
 
@@ -24,6 +26,18 @@ class ValidationBuilder {
 
   final FormValidatorLocale _locale;
   final List<StringValidationCallback> validations = [];
+  bool _required;
+
+  ValidationBuilder from(ValidationBuilder pValidationBuilder) {
+    if (pValidationBuilder != null) {
+      if (_required && !pValidationBuilder._required) {
+        this.required();
+      }
+      this.validations.addAll(pValidationBuilder.validations);
+    }
+
+    return this;
+  }
 
   /// Clears validation list and adds required validation if
   ValidationBuilder reset() {
@@ -86,8 +100,14 @@ class ValidationBuilder {
   }
 
   /// Value must not be empty or null
-  ValidationBuilder required([String message]) =>
-      add((v) => (v?.isEmpty ?? true) ? message ?? _locale.required() : null);
+  ValidationBuilder required([String message]) {
+    _required = true;
+    return add(requiredValidator(message));
+    // (v) => (v?.isEmpty ?? true) ? message ?? _locale.required() : null);
+  }
+
+  Function requiredValidator([String message]) =>
+      (v) => (v?.isEmpty ?? true) ? message ?? _locale.required() : null;
 
   /// Value length must be greater than or equal to [minLength]
   ValidationBuilder minLength(int minLength, [String message]) =>
@@ -186,11 +206,11 @@ class ValidationBuilder {
           : message ?? _locale.email(v));
 
   /// Value must be a well formatted phone number
-  ValidationBuilder phone([String message]) =>
-      add((v) => !_anyLetter.hasMatch(v) &&
-              _phoneRegExp.hasMatch(v.replaceAll(_nonDigitsExp, ''))
-          ? null
-          : message ?? _locale.phoneNumber(v));
+  ValidationBuilder phone([String message]) => add((v) => (v.isEmptyOrNull() ||
+          (!_anyLetter.hasMatch(v) &&
+              _phoneRegExp.hasMatch(v.replaceAll(_nonDigitsExp, ''))))
+      ? null
+      : message ?? _locale.phoneNumber(v));
 
   /// Value must be a well formatted IPv4 address
   ValidationBuilder ip([String message]) =>
@@ -241,4 +261,10 @@ class ValidationBuilder {
       add((v) => (v.isEmptyOrNull() || RegExp(pattern).hasMatch(v))
           ? null
           : message ?? _locale.pattern(v));
+
+  /// Value must be a date
+  ValidationBuilder date([String message]) =>
+      add((v) => (v.isNotEmptyOrNull() && DateTime.tryParse(v) == null)
+          ? message ?? _locale.date(v)
+          : null);
 }

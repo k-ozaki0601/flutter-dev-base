@@ -4,8 +4,8 @@ import 'config.dart';
 import '../../../base/extensions/input_decoration.dart';
 import 'validation/validator_builder.dart';
 
-class PositiveIntegerTextFormField extends TextFormField {
-  PositiveIntegerTextFormField({
+class PhoneTextFormField extends TextFormField {
+  PhoneTextFormField({
     Key key,
     TextEditingController controller,
     String initialValue,
@@ -16,7 +16,7 @@ class PositiveIntegerTextFormField extends TextFormField {
     TextStyle style,
     StrutStyle strutStyle,
     TextDirection textDirection,
-    TextAlign textAlign = TextAlign.right,
+    TextAlign textAlign = TextAlign.left,
     TextAlignVertical textAlignVertical,
     bool autofocus = false,
     bool readOnly = false,
@@ -32,7 +32,6 @@ class PositiveIntegerTextFormField extends TextFormField {
     int maxLines = 1,
     int minLines,
     bool expands = false,
-    int maxLength,
     ValueChanged<String> onChanged,
     GestureTapCallback onTap,
     VoidCallback onEditingComplete,
@@ -59,7 +58,8 @@ class PositiveIntegerTextFormField extends TextFormField {
           controller: controller,
           initialValue: initialValue,
           focusNode: focusNode,
-          decoration: decoration.from({'required': required}),
+          decoration:
+              decoration.from({'required': required, 'hintText': 'ハイフンなし'}),
           keyboardType: TextInputType.number,
           textCapitalization: textCapitalization,
           textInputAction: textInputAction ?? config['textInputAction'],
@@ -82,7 +82,7 @@ class PositiveIntegerTextFormField extends TextFormField {
           maxLines: maxLines,
           minLines: minLines,
           expands: expands,
-          maxLength: maxLength,
+          maxLength: 15,
           onChanged: onChanged,
           onTap: onTap,
           onEditingComplete: onEditingComplete,
@@ -90,8 +90,7 @@ class PositiveIntegerTextFormField extends TextFormField {
           onSaved: onSaved,
           validator: ValidationBuilder(required: required)
               .from(validationBuilder)
-              .min(1)
-              .integer()
+              .phone()
               .build(),
           inputFormatters: inputFormatters,
           enabled: enabled,
